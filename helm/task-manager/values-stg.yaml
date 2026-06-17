@@ -1,0 +1,9 @@
+replicaCount: 2
+
+image:
+  tag: "stg"
+
+resources:
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
