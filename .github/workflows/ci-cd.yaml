@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - main
-      
+
 permissions:
-  contents: write      
+  contents: write
 
 jobs:
   build-and-push:
@@ -41,4 +41,5 @@ jobs:
           git config user.email "github-actions@github.com"
           git add helm/task-manager/values.yaml
           git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
-          git push  
+          git pull --rebase origin main
+          git push origin main
