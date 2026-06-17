@@ -27,3 +27,15 @@ jobs:
 
       - name: Push frontend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
+
+      - name: Update Helm image tags
+        run: |
+          sed -i "s/tag: .*/tag: \"${{ github.sha }}\"/" helm/task-manager/values.yaml
+
+      - name: Commit and push Helm changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add helm/task-manager/values.yaml
+          git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
+          git push  
