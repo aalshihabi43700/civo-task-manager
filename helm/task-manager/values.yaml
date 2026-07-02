@@ -11,7 +11,7 @@ image:
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "395ce4ef34d38e1656e856f52f3f82835b10654e"
+  tag: "b4d3ff5fd86fb28b41fb5150bffc2a79bddc4dd1"
 
 
 containerPort: 8000
