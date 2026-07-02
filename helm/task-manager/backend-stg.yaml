@@ -1,0 +1,30 @@
+nameOverride: backend
+
+replicaCount: 1
+
+image:
+  repository: aashihabi/task-backend
+  tag: "stg"
+  pullPolicy: IfNotPresent
+
+containerPort: 8000
+
+service:
+  type: ClusterIP
+  port: 8000
+livenessProbe:
+  enabled: true
+  path: /health
+
+readinessProbe:
+  enabled: true
+  path: /ready
+  
+resources:
+  requests:
+    cpu: "100m" 
+    memory: "128Mi"   
+
+  limits:
+    cpu: "500m"
+    memory: "512Mi"  

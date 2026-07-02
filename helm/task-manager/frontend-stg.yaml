@@ -1,0 +1,26 @@
+nameOverride: frontend
+
+replicaCount: 1
+
+image:
+  repository: aashihabi/task-frontend
+  tag: "stg"
+  pullPolicy: IfNotPresent
+
+containerPort: 80
+
+service:
+  type: LoadBalancer
+  port: 80
+
+livenessProbe:
+  enabled: false
+  path: /
+
+resources:
+  requests:
+    cpu: "50m" 
+    memory: "64Mi"
+limits:
+  cpu: "250m"    
+  memory: "250Mi"
