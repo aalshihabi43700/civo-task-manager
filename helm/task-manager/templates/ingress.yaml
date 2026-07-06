@@ -11,14 +11,14 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: frontend
+                name: frontend-stg-task
                 port:
                   number: 80
           - path: /api
             pathType: Prefix
             backend:
               service:
-                name: backend
+                name: backend-stg-task
                 port:
                   number: 8000
 {{- end }}

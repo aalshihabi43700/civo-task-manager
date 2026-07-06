@@ -8,6 +8,8 @@ image:
   pullPolicy: IfNotPresent
 
 containerPort: 80
+ingress:
+  enabled: true
 
 service:
   type: LoadBalancer
@@ -24,5 +26,3 @@ resources:
 limits:
   cpu: "250m"    
   memory: "250Mi"
-ingress:
-  enabled: true
