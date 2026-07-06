@@ -5,6 +5,20 @@
 </head>
 <body>
   <h1>Civo Task Manager - STG</h1>
-  <p>Version 1 deployed using GitHub Actions + Docker Hub + Argo CD</p>
+
+  <p id="backend-status">Checking backend...</p>
+
+  <script>
+    fetch("/api/health")
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("backend-status").innerText =
+          "Backend status: " + data.status;
+      })
+      .catch(error => {
+        document.getElementById("backend-status").innerText =
+          "Backend connection failed";
+      });
+  </script>
 </body>
 </html>
