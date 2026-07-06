@@ -4,7 +4,7 @@ replicaCount: 1
 
 image:
   repository: aashihabi/task-frontend
-  tag: "stg"
+  tag: "b749220db0b9433ab379fad99b6a4d540e1dab02"
   pullPolicy: IfNotPresent
 
 containerPort: 80
