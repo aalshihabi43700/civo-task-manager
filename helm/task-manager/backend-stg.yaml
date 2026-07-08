@@ -7,11 +7,11 @@ image:
   tag: "stg"
   pullPolicy: IfNotPresent
 
-containerPort: 8000
+containerPort: 80
 
 service:
   type: ClusterIP
-  port: 8000
+  port: 80
 livenessProbe:
   enabled: true
   path: /health
