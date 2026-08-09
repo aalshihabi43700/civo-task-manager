@@ -25,6 +25,15 @@ jobs:
       - name: Build frontend image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }} ./frontend
 
+
+      - name: Scan frontend image (Trivy)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
+          
       - name: Push frontend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
 
@@ -41,11 +50,4 @@ jobs:
           git pull --rebase origin main
           git push origin main
 
-      - name: Install Trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: image
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
-          format: table
-          exit-code: '1'
-          severity: HIGH,CRITICAL    
+ 
