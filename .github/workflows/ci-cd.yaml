@@ -21,12 +21,28 @@ jobs:
 
       - name: Build backend image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/task-backend:${{ github.sha }} ./backend
+        
+      - name: Scan backend image (Trivy)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/task-backend:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
 
       - name: Push backend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/task-backend:${{ github.sha }}
 
       - name: Build frontend image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }} ./frontend
+
+      - name: Scan frontend image (Trivy)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
+          format: table
+          exit-code: '1'
+          severity: CRITICAL,HIGH
 
       - name: Push frontend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
