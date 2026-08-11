@@ -59,15 +59,13 @@ jobs:
           git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
           git pull --rebase origin main
           git push origin main
-
-
 name: Certificate Expiry Monitoring
 
 on:
   workflow_dispatch:
 
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 6 * * *"   # 9:00 AM Saudi time
 
 jobs:
   certificate-monitor:
@@ -90,6 +88,8 @@ jobs:
       - name: Check certificate expiry
         shell: pwsh
         run: ./scripts/check-cert-expiry.ps1
+
+
 
 
     
