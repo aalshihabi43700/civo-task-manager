@@ -1,29 +1,61 @@
-name: Certificate Expiry Monitoring
+name: CI CD Pipeline
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
-  schedule:
-    - cron: "0 6 * * *"   # 9:00 AM Saudi time
+permissions:
+  contents: write
 
 jobs:
-  certificate-monitor:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Configure kubeconfig
-        shell: bash
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Build backend image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/task-backend:${{ github.sha }} ./backend
+        
+      - name: Scan backend image (Trivy)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/task-backend:${{ github.sha }}
+          format: table
+          exit-code: '0'
+          severity: CRITICAL,HIGH
+
+      - name: Push backend image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/task-backend:${{ github.sha }}
+
+      - name: Build frontend image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }} ./frontend
+
+      - name: Scan frontend image (Trivy)
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
+          format: table
+          exit-code: '0'
+          severity: CRITICAL,HIGH
+
+      - name: Push frontend image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/task-frontend:${{ github.sha }}
+
+      - name: Update Helm image tags
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG_CIVO }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
+          sed -i "s/tag: .*/tag: \"${{ github.sha }}\"/" helm/task-manager/values.yaml
 
-      - name: Verify Kubernetes connection
-        run: kubectl get nodes
-
-      - name: Check certificate expiry
-        shell: pwsh
-        run: ./scripts/check-cert-expiry.ps1
+      - name: Commit and push Helm changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add helm/task-manager/values.yaml
+          git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
+          git pull --rebase origin main
+          git push origin main
