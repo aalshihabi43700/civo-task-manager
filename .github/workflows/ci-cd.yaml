@@ -59,3 +59,34 @@ jobs:
           git commit -m "Update image tag to ${{ github.sha }}" || echo "No changes to commit"
           git pull --rebase origin main
           git push origin main
+
+      - name: Certificate Expiry Check
+        on:
+          workflow_dispatch:
+
+          schedule:
+            - cron: "0 6 * * *"
+
+          jobs:
+            certificate-expiry-check:
+              runs-on: ubuntu-latest
+
+          steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Configure Kubernetes access
+              shell: bash
+              run: |
+                mkdir -p ~/.kube
+                echo "${{ secrets.KUBECONFIG_CIVO }}" > ~/.kube/config
+                chmod 600 ~/.kube/config
+
+            - name: Verify Kubernetes connection
+              run: kubectl get nodes
+
+            - name: Check certificate expiry
+              shell: pwsh
+              run: ./scripts/check-cert-expiry.ps1   
+
+ 
