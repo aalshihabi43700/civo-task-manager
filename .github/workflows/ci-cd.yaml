@@ -61,25 +61,28 @@ jobs:
           git push origin main
 
 
-      - name: Certificate Expiry Monitoring
-        on:
-          workflow_dispatch:
-          schedule:
-           - cron: "0 6 * * *"   # 9:00 AM Saudi time 
-        jobs:
-          certificate-monitor:
-            runs-on: ubuntu-latest   
-            steps:
-              - name: Checkout repository
-                uses: actions/checkout@v4
+name: Certificate Expiry Monitoring
 
-              - name: Configure kubeconfig
-                shell: bash
+on:
+  workflow_dispatch:
 
-                run: |
-                  mkdir -p ~/.kube
-                  echo "${{ secrets.KUBECONFIG_CIVO }}" > ~/.kube/config
-                  chmod 600 ~/.kube/config
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  certificate-monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure kubeconfig
+        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG_CIVO }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
 
       - name: Verify Kubernetes connection
         run: kubectl get nodes
